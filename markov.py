@@ -1,31 +1,3 @@
-# import random
-# import sys
-#
-
-# class MarkovMatrix:
-#     def __init__(self, training_data):
-#         self.data = {}
-#         self.training_data = training_data
-#
-#     def train(self):
-#         prev = ()
-#         for token in self.training_data:
-#             token = sys.intern(token)
-#             for pprev in [prev[i:] for i in range(len(prev) + 1)]:
-#                 if not pprev in self.data:
-#                     self.data[pprev] = [0, {}]
-#
-#                 if not token in self.data[pprev][1]:
-#                     self.data[pprev][1][token] = 0
-#
-#                 self.data[pprev][1][token] += 1
-#                 self.data[pprev][0] += 1
-#
-#             prev += (token,)
-#
-#     def get_matrix(self):
-#         return self.data
-
 import random
 import sys
 
