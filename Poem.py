@@ -1,23 +1,22 @@
- import MarkovAgent
+ from MarkovAgent import MarkovAgent
+ from markov import MarkovMatrix
  
  class Poem:
-    def _init_(matrix, words, initWord, numLines, numWords, category):
-        self.matrix = matrix
-        self.words = words
+    def _init_(markov, words, initWord, numLines, numWords, category):
+        self.markov = markov
         self.initWord = initWord
         self.numLines = numLines
         self.numWords = numWords
         self.category = category
         
     def generatePoem(iterations):
-        agent = MarkovAgent(self.matrix, self.words, self.initWord)
+        agent = MarkovAgent(self.markov, self.initWord)
         poem = ""
         
-        for i in range(self.numLines):
-            
+        for i in range(self.numLines):   
             bestLine = ""
             
-            for j in range(iterations):
+            for j in range(self.iterations):
                 tmpLine = ""
                 
                 for k in range(self.numWords):
