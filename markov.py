@@ -1,45 +1,29 @@
 import random
 import sys
 
+BEGIN = "___BEGIN__"
+END = "___END__"
+
 
 class MarkovMatrix:
-    def __init__(self, training_data):
-        self.data = {}
-        self.training_data = training_data
-        self.prev = ''
+    def __init__(self, corpus, state_size, matrix=None):
+        self.corpus = corpus
+        self.state_size = state_size
+        self.matrix = {}
 
-    def train(self):
-        prev = ""
-        for token in self.training_data:
-            token = sys.intern(token)
-            if not prev in self.data:
-                self.data[prev] = [0, {}]
+    def train(self, corpus, state_size):
+        for token in self.corpus:
+            key = ([ BEGIN ] * state_size) + key + [ END ]
+            for i in range(len(token) + 1):
+                state = tuple(key[i:i + state_size])
+                follow = key[i + state_size]
+                if state not in self.matrix:
+                    self.matrix[state] = {}
 
-            if not token in self.data[prev][1]:
-                self.data[prev][1][token] = 0
+                if follow not in self.matrix[state]:
+                    self.matrix[state][follow] = 0
 
-            self.data[prev][1][token] += 1
-            self.data[prev][0] += 1
-
-            prev = token
+                self.matrix[state][follow] += 1
 
     def get_matrix(self):
-        return self.data
-
-    def selectToken(self, state=None):
-        if state is None:
-            state = self.prev
-        if not state in self.data:
-            self.data[state] = 0
-        self.data[state] += 1
-        return self._choose(self.data[state])
-
-    def choose(self, freqdict):
-        total, choices = freqdict
-        idx = random.randrange(total)
-
-        for token, freq in choices.items():
-            if idx <= freq:
-                return token
-
-            idx -= freq
+        return self.matrix
