@@ -10,10 +10,11 @@ class MarkovMatrix:
         self.corpus = corpus
         self.state_size = state_size
         self.matrix = {}
+        self.train(corpus, state_size)
 
     def train(self, corpus, state_size):
         for token in self.corpus:
-            key = ([ BEGIN ] * state_size) + key + [ END ]
+            key = ([ BEGIN ] * state_size) + token + [ END ]
             for i in range(len(token) + 1):
                 state = tuple(key[i:i + state_size])
                 follow = key[i + state_size]
@@ -27,3 +28,17 @@ class MarkovMatrix:
 
     def get_matrix(self):
         return self.matrix
+    
+# Example Usage
+
+text = [["Farewell", "dear", "mate,", "dear", "love!"],
+        ["I’m", "going", "away,", "I", "know", "not", "where"]]
+
+m = MarkovMatrix(text, 2)
+matrix = m.get_matrix()
+
+for item in matrix:
+    print(item, end= ' = ')
+    print(matrix[item])
+
+print(matrix[("Farewell", "dear")])
