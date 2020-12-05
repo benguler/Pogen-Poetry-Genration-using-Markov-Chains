@@ -19,9 +19,9 @@ from textblob import TextBlob
 from textblob.classifiers import NaiveBayesClassifier
 
 
-class PoemUtility():
-    
-            
+class PoemUtility:
+
+    @staticmethod
     def tokenize(filename):
         try:
             matrix = []
@@ -38,8 +38,8 @@ class PoemUtility():
             print ('File not found in tokenize method')
     
     
-    
-    def classifyPoems(self, filename):
+    @staticmethod
+    def classifyPoems(filename):
         try:
             with open('CSVs/processed/'+filename, 'r') as fp:
                 global cl
@@ -48,8 +48,8 @@ class PoemUtility():
             print('File not found for Naive-Bayes Classifier')
             
 
-
-    def classifySentence(self, sentence, category):
+    @staticmethod
+    def classifySentence(sentence, category):
         prob_dist = cl.prob_classify(sentence)
         return round(prob_dist.prob(category),2)
                 
