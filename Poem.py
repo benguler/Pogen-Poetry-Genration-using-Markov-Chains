@@ -1,19 +1,17 @@
-import MarkovAgent
+from MarkovAgent import MarkovAgent
 from markov import MarkovMatrix
- 
+from PoemUtility import PoemUtility
+import syllables
+
 class Poem:
-    def _init_(self, markov, words, initWord, numLines, numWords, category):
+    def _init_(markov, words, initWord, numLines, numSyl, category):
         self.markov = markov
         self.initWord = initWord
         self.numLines = numLines
         self.numWords = numWords
         self.category = category
-
-    def nbDist(self, line):
-        #Get NaiveBayes probability distance for category
-        return 0
         
-    def generatePoem(self, iterations):
+    def generatePoem(iterations):
         agent = MarkovAgent(self.markov, self.initWord)
         poem = ""
         
@@ -23,15 +21,29 @@ class Poem:
             for j in range(self.iterations):
                 tmpLine = ""
                 
-                for k in range(self.numWords):
+                seed = agent.getWord()
+                sylCount = 0
+                
+                while(sylCount != numSyl[i]):
                     tmpLine += agent.getWord() + " "
+                    sylCount += syllables.estiamte(agent.getWord())
                     
                     agent.transition()
                     
-                if(self.nbDist(tmpLine) > self.nbDist(bestLine)):
-                    bestLine = tmpLine
+                    if(sylCount > numSyl[i]):
+                        tmpLine = ""
+                        sylCount = 0
+                        agent.setWord(seed)
+                    
+                if(nbDist(line) > nbDist(bestLine)):
+                    bestLine = line
                     
             poem += bestLine
             poem += "\n"
             
         return poem
+        
+    def nbDist(line):
+        #Get NaiveBayes probability distance for category 
+        return PoemUtility.classifySentence(line)
+    
