@@ -46,7 +46,7 @@ class Poem:
         
     def nbDist(self, line):
         #Get NaiveBayes probability distribution for category 
-        return PoemUtility.classifySentence(line, self.catagory)
+        return PoemUtility.classifySentence(line, self.category)
         
         return 0
     
