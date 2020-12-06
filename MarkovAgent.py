@@ -2,19 +2,21 @@ import random
 from markov import MarkovMatrix
 
 class MarkovAgent:
-    def __init__(self, markov, initWord):
+    def __init__(self, markov, initState):
         self.markov = markov
-        self.word = initWord
-        
+        self.state = initState
         self.markov = markov
+        self.stateSize = markov.state_size
     
     def transition(self):
-        self.word = ((self.markov.move(self.word), ))
+        newState = self.state[1:self.stateSize] + (self.markov.move(self.state), )
+    
+        self.state = newState
         
-    def getWord(self):
-        return self.word
+    def getState(self):
+        return self.state
         
-    def setWord(self, word):
-        self.word = word
+    def setState(self, state):
+        self.state = state
         
     
