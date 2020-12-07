@@ -4,10 +4,9 @@ from PoemUtility import PoemUtility
 import syllables
 
 class Poem:
-    def __init__(self, markovMatrix, numLines, numSyl, category):
-        #params: markov probability matrix, number of lines, number of syllables per line, category of poem
+    def __init__(self, markovMatrix, numSyl, category):
+        #params: markov probability matrix, number of syllables per line, category of poem (period_genre)
         self.markovMatrix = markovMatrix
-        self.numLines = numLines
         self.numSyl = numSyl
         self.category = category
         
@@ -19,7 +18,7 @@ class Poem:
         poem = ""
         
         #For each line of the poem
-        for i in range(self.numLines):  
+        for s in self.numSyl:  
             bestLine = ""
             
             #Generate line for poem and run nb classification for num of iterations
@@ -35,9 +34,9 @@ class Poem:
                 
                 #Generate line with roughly correct number of syllables
                 #len(agent.getState()) - 1] == "___END__") implies line is finished
-                while(not(sylCount == self.numSyl[i] and agent.getState()[len(agent.getState()) - 1] == "___END__")):
-                    if(sylCount > self.numSyl[i] or agent.getState()[len(agent.getState()) - 1] == "___END__"):    #If number of syllables has been surpassed or finished line has too few syllables 
-                        #Start new line with new seed
+                while(not(sylCount == s and agent.getState()[len(agent.getState()) - 1] == "___END__")):
+                    if(sylCount > s or agent.getState()[len(agent.getState()) - 1] == "___END__"):    #If number of syllables has been surpassed or finished line has too few syllables 
+                        #Restart with new line with new seed
                         agent.setState(self.genSeed())
                         
                         tmpLine = ""
