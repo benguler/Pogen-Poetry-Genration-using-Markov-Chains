@@ -1,5 +1,5 @@
 import random
-import bisect
+import json
 import sys
 
 BEGIN = "___BEGIN__"
@@ -50,7 +50,9 @@ class MarkovMatrix:
         :param state: The current state
         :return: The next random word
         """
-        freqdict = self.matrix[state]
+        freqdict = self.matrix.get(state)
+        if freqdict is None:
+            return END
         choices = list(freqdict.keys())
         freq = list(freqdict.values())
         freqlist = random.choices(choices, weights=freq, k=sum(freq))
@@ -81,8 +83,31 @@ class MarkovMatrix:
         """
         return list(self.gen(init_state, iteration))
 
+    def to_json(self):
+        return json.dumps(list(self.matrix.items()))
+
     def get_matrix(self):
         return self.matrix
+
+    @classmethod
+    def from_json(cls, data):
+        if isinstance(data, str):
+            obj = json.loads(data)
+        else:
+            obj = data
+
+        if isinstance(obj, list):
+            rehydrated = dict((tuple(item[0]), item[1]) for item in obj)
+        elif isinstance(obj, dict):
+            rehydrated = obj
+        else:
+            raise ValueError("Object should be dict or list")
+
+        state_size = len(list(rehydrated.keys())[0])
+
+        inst = cls(None, state_size, rehydrated)
+        return inst
+
 
 
 ''' Example Usage'''
@@ -93,8 +118,15 @@ text = [["Farewell", "dear", "mate,", "dear", "love!"],
         ["So", "Good-bye", "my", "Fancy"]]
 
 m = MarkovMatrix(text, 2)
-matrix = m.get_matrix()
+# s = ''
+# with open('example.txt', 'w') as outfile:
+#     s = m.to_json()
+#     json.dump(s, outfile)
+# m2 = MarkovMatrix.from_json(s)
+# if m.get_matrix() == m2.get_matrix():
+#     print("load success")
 
+matrix = m.get_matrix()
 for key, value in matrix.items():
     print(key, end=': ')
     print(value)
