@@ -25,7 +25,7 @@ from classifiers import NaiveBayesClassifier
 class PoemUtility:
 
     @staticmethod
-    def tokenize(self, filename):
+    def tokenize(filename):
         try:
             matrix = []
             with open ('CSVs/processed/'+filename, 'r') as csvfile:
@@ -42,7 +42,7 @@ class PoemUtility:
     
     
     @staticmethod
-    def classifyPoems(self, filename):
+    def classifyPoems(filename):
         try:
             with open('CSVs/processed/'+filename, 'r') as fp:
                 print('opened ' + filename )
@@ -54,7 +54,7 @@ class PoemUtility:
             
 
     @staticmethod
-    def classifySentence(self, sentence, category):
+    def classifySentence(sentence, category):
         prob_dist = cl.prob_classify(sentence)
         return round(prob_dist.prob(category),2)
                 
