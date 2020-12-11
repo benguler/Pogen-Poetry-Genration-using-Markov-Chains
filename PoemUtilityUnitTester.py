@@ -13,33 +13,35 @@ from PoemUtility import *
 
 class PoemUtilityUnitTester(unittest.TestCase):
     
-    def test_classifyPoems(self):
-        filename = 'test.csv'
-        PoemUtility.classifyPoems(self,filename)
-        
-        
     def test_tokenize(self):
-        filename = 'test.csv'
-        PoemUtility.tokenize(filename)
+        filename = 'all_proc.csv'
+        #some_matrix
+        PoemUtility.tokenize(self, filename)
         #print(some_matrix)
-        
-        
+
+
+    def test_tokenize_exception(self):
+        filename = 'some_file_from_another_world'
+        self.assertRaises(Exception, PoemUtility.tokenize(self, filename))
+            
+
+    def test_classifyPoems(self):
+        filename = 'all_proc.csv'
+        PoemUtility.classifyPoems(self,filename)
+
+
+    def test_classifyPoems_exception(self):
+        filename = 'mooooodern_loooove.csv'
+        self.assertRaises(Exception, PoemUtility.classifyPoems(self, filename))
+
+    
     def test_classifySentence(self):
         sentence = 'He caught me running with Lucius Atherton'
         category = 'modern_love'
         result = PoemUtility.classifySentence(self, sentence, category)
         print(result)
-        
-        
-    def test_tokenize_exception(self):
-        filename = 'some_file_from_another_world'
-        self.assertRaises(Exception, PoemUtility.tokenize(filename))
-        
-        
-    def test_classifyPoems_exception(self):
-        filename = 'mooooodern_loooove.csv'
-        self.assertRaises(Exception, PoemUtility.classifyPoems(self, filename))
-        
+          
+
         
 if __name__ == '__main__':
     unittest.main()

@@ -16,13 +16,16 @@ This python script contains three important functionality
 
 import csv
 from textblob import TextBlob
-from textblob.classifiers import NaiveBayesClassifier
+#from textblob.classifiers import NaiveBayesClassifier
+
+#according to StackOverflow use the classifiers.py is faster in training and classifying
+from classifiers import NaiveBayesClassifier
 
 
 class PoemUtility:
 
     @staticmethod
-    def tokenize(filename):
+    def tokenize(self, filename):
         try:
             matrix = []
             with open ('CSVs/processed/'+filename, 'r') as csvfile:
@@ -35,21 +38,23 @@ class PoemUtility:
                     matrix.append(mystr)
             return matrix
         except IOError:
-            print ('File not found in tokenize method')
+            print ('\nFile not found in tokenize() method')
     
     
     @staticmethod
-    def classifyPoems(filename):
+    def classifyPoems(self, filename):
         try:
             with open('CSVs/processed/'+filename, 'r') as fp:
+                print('opened ' + filename )
                 global cl
                 cl = NaiveBayesClassifier(fp, format="csv")
+                print(cl)
         except IOError:
-            print('File not found for Naive-Bayes Classifier')
+            print('\nFile not found for Naive-Bayes Classifier')
             
 
     @staticmethod
-    def classifySentence(sentence, category):
+    def classifySentence(self, sentence, category):
         prob_dist = cl.prob_classify(sentence)
         return round(prob_dist.prob(category),2)
                 
