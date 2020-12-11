@@ -109,6 +109,22 @@ class MarkovMatrix:
         return inst
 
 
+class ReverseMarkovMatrix(MarkovMatrix):
+    def train(self, corpus, state_size):
+        for token in self.corpus:
+            token.reverse()
+            key = ([BEGIN] * state_size) + token + [END]
+            for i in range(len(token) + 1):
+                state = tuple(key[i:i + state_size])
+                follow = key[i + state_size]
+                if state not in self.matrix:
+                    self.matrix[state] = {}
+
+                if follow not in self.matrix[state]:
+                    self.matrix[state][follow] = 0
+
+                self.matrix[state][follow] += 1
+
 
 ''' Example Usage'''
 
@@ -118,18 +134,12 @@ text = [["Farewell", "dear", "mate,", "dear", "love!"],
         ["So", "Good-bye", "my", "Fancy"]]
 
 m = MarkovMatrix(text, 2)
-# s = ''
-# with open('example.txt', 'w') as outfile:
-#     s = m.to_json()
-#     json.dump(s, outfile)
-# m2 = MarkovMatrix.from_json(s)
-# if m.get_matrix() == m2.get_matrix():
-#     print("load success")
+r = ReverseMarkovMatrix(text, 2)
 
-matrix = m.get_matrix()
+matrix = r.get_matrix()
 for key, value in matrix.items():
     print(key, end=': ')
     print(value)
 
 for i in range(4):
-    print(m.walk())
+    print(r.walk())
