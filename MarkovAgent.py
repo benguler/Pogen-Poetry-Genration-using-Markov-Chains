@@ -1,5 +1,5 @@
 import random
-from markov import MarkovMatrix
+from markov import MarkovMatrix, ReverseMarkovMatrix
 
 class MarkovAgent:
     def __init__(self, markovMatrix, initState):
@@ -25,5 +25,8 @@ class MarkovAgent:
         #Param: new state
         #Set agent's current state
         self.state = state
+        
+    def getLastWord(self):
+        return self.state[self.stateSize - 1]
         
     

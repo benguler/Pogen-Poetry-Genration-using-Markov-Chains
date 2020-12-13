@@ -38,25 +38,22 @@ class Poem:
             bestScore = 0
             
             self.lstWrds += [agent.getState()[0]]
-            #print(agent.getState())
             
             #Generate line for poem and run nb classification for num of iterations
-            for j in range(iterations):
+            while(bestScore < 0.7):
                 tmpLine = ""
                 
                 sylCount = 0
                 
                 #Add initial state to poem, minus the last word of that state
-                for i in range(len(agent.getState()) - 1):
+                for i in range(agent.stateSize - 1):
                     tmpLine = agent.getState()[i] + " " + tmpLine
                     sylCount += syllables.estimate(agent.getState()[i])
                 
-                print("1", tmpLine)
-                
                 #Generate line with roughly correct number of syllables
-                #len(agent.getState()) - 1] == END) implies line is finished
-                while(not(sylCount > s and agent.getState()[len(agent.getState()) - 1] == END)):
-                    if(agent.getState()[len(agent.getState()) - 1] == END):              #If finished line has too few syllables 
+                #agent.stateSize - 1] == END) implies line is finished
+                while(not(sylCount > s and agent.getLastWord() == END)):
+                    if(agent.getLastWord() == END):              #If finished line has too few syllables 
                         #Restart with new line with new seed
                         agent.setState(self.genSeed(lsti))
                         #print(agent.getState())
@@ -66,14 +63,12 @@ class Poem:
                         
                         sylCount = 0
                         
-                        for i in range(len(agent.getState()) - 1):
+                        for i in range(agent.stateSize - 1):
                             tmpLine = agent.getState()[i] + " " + tmpLine
                             sylCount += syllables.estimate(agent.getState()[i])
-                        
-                        print("2 ", tmpLine)
                     
-                    tmpLine = agent.getState()[len(agent.getState()) - 1] + " " + tmpLine #Add the last word of the agent's current state to the line
-                    sylCount += syllables.estimate(agent.getState()[len(agent.getState()) - 1]) #Update overall syllable count
+                    tmpLine = agent.getLastWord() + " " + tmpLine #Add the last word of the agent's current state to the line
+                    sylCount += syllables.estimate(agent.getLastWord()) #Update overall syllable count
                     
                     agent.transition()  #Have the agent transition to a new state
                    
@@ -105,20 +100,21 @@ class Poem:
             bestScore = 0
             
             #Generate line for poem and run nb classification for number of iterations
-            for j in range(iterations):
+            while(bestScore < 0.7):
                 tmpLine = ""
                 
                 sylCount = 0
                 
                 #Add initial state to poem, minus the last word of that state
-                for i in range(len(agent.getState()) - 1):
+                for i in range(agent.stateSize - 1):
                     tmpLine += agent.getState()[i] + " "
                     sylCount += syllables.estimate(agent.getState()[i])
                 
                 #Generate line with roughly correct number of syllables
-                #len(agent.getState()) - 1] == END) implies line is finished
-                while(not(sylCount == s and agent.getState()[len(agent.getState()) - 1] == END)):
-                    if(sylCount > s or agent.getState()[len(agent.getState()) - 1] == END):    #If number of syllables has been surpassed or finished line has too few syllables 
+                #agent.stateSize - 1] == END) implies line is finished
+                
+                while(not(sylCount == s and agent.getState()[agent.stateSize - 1] == END)):
+                    if(sylCount > s or agent.getLastWord() == END):    #If number of syllables has been surpassed or finished line has too few syllables 
                         #Restart with new line with new seed
                         agent.setState(self.genSeed())
                         
@@ -126,12 +122,12 @@ class Poem:
                         
                         sylCount = 0
                         
-                        for i in range(len(agent.getState()) - 1):
+                        for i in range(agent.stateSize - 1):
                             tmpLine += agent.getState()[i] + " "
                             sylCount += syllables.estimate(agent.getState()[i])
                     
-                    tmpLine += agent.getState()[len(agent.getState()) - 1] + " "    #Add the last word of the agent's current state to the line
-                    sylCount += syllables.estimate(agent.getState()[len(agent.getState()) - 1]) #Update overall syllable count
+                    tmpLine += agent.getLastWord() + " "    #Add the last word of the agent's current state to the line
+                    sylCount += syllables.estimate(agent.getLastWord()) #Update overall syllable count
                     
                     agent.transition()  #Have the agent transition to a new state
                     
@@ -169,7 +165,7 @@ class Poem:
                 
             agent.setState(seed)
             
-            #Finish seed seed
+            #Finish seed
             for k in range(self.markovMatrix.state_size - 1):
                 agent.transition()
 
@@ -200,8 +196,7 @@ class Poem:
     def nbDist(self, line):
         #param: line to run Naive-Bayes classification on
         #Get NaiveBayes probability distribution for category
-        #score = PoemUtility.classifySentence(line, self.category)
-        #return score
+        return PoemUtility.classifySentence(line, self.category)
         
         #Return 0 when not testing nb classification. Training takes too long
         return 0
