@@ -26,7 +26,7 @@ class PoemUtilityUnitTester(unittest.TestCase):
             
 
     def test_classifyPoems(self):
-        filename = 'modern_renaissance.csv'
+        filename = 'all_200.csv'
         PoemUtility.classifyPoems(filename)
 
 
@@ -35,11 +35,11 @@ class PoemUtilityUnitTester(unittest.TestCase):
     #     self.assertRaises(Exception, PoemUtility.classifyPoems(filename))
 
     
-    # def test_classifySentence(self):
-    #     sentence = 'He caught me running with Lucius Atherton'
-    #     category = 'modern_love'
-    #     result = PoemUtility.classifySentence(sentence, category)
-    #     print(result)
+    def test_classifySentence(self):
+        sentence = 'He caught me running with Lucius Atherton'
+        category = 'modern_love'
+        result = PoemUtility.classifySentence(sentence, category)
+        print(result)
           
 
         
