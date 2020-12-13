@@ -2,6 +2,7 @@ from MarkovAgent import MarkovAgent
 from markov import MarkovMatrix, ReverseMarkovMatrix
 from PoemUtility import PoemUtility
 import syllables
+import pronouncing
 
 BEGIN = "___BEGIN__"
 END = "___END__"
@@ -25,6 +26,7 @@ class Poem:
         #Generate poem given specifications in constructor
         agent = MarkovAgent(self.markovMatrix, self.genSeed())
         poem = ""
+        lstWords = [agent.getState(0)]
         
         #For each line of the poem
         for s in self.numSyl:  
@@ -39,7 +41,7 @@ class Poem:
                 
                 #Add initial state to poem, minus the last word of that state
                 for i in range(len(agent.getState()) - 1):
-                    tmpLine += agent.getState()[i] + " "
+                    tmpLine = agent.getState()[len(agent.getState()) - 1] + " " + tmpLine
                     sylCount += syllables.estimate(agent.getState()[i])
                 
                 #Generate line with roughly correct number of syllables
@@ -84,7 +86,7 @@ class Poem:
             bestLine = ""
             bestScore = 0
             
-            #Generate line for poem and run nb classification for num of iterations
+            #Generate line for poem and run nb classification for number of iterations
             for j in range(iterations):
                 tmpLine = ""
                 
@@ -144,7 +146,9 @@ class Poem:
         return self.gsNoRhyme()
     
     def gsRhyme(self):
-        return ""
+        seed = tuple(self.markovMatrix.walk(None, self.markovMatrix.state_size))
+        
+        
     
     def gsNoRhyme(self):
         seed = tuple(self.markovMatrix.walk(None, self.markovMatrix.state_size))
