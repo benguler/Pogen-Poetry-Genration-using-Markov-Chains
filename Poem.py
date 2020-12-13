@@ -14,6 +14,8 @@ class Poem:
         self.numSyl = numSyl
         self.category = category
         self.rhyme = rhyme
+        
+        self.lstWrds = []
     
     def generatePoem(self, iterations):
         if(self.rhyme):
@@ -24,14 +26,19 @@ class Poem:
     def gpRhyme(self, iterations):
         #param: Number of iteration to run Naive-Bayes classification
         #Generate poem given specifications in constructor
-        agent = MarkovAgent(self.markovMatrix, self.genSeed())
+        agent = MarkovAgent(self.markovMatrix, self.genSeed(0))
         poem = ""
-        lstWords = [agent.getState(0)]
+        self.lstWrds = []
         
         #For each line of the poem
+        
+        lsti = 0
         for s in self.numSyl:  
             bestLine = ""
             bestScore = 0
+            
+            self.lstWrds += [agent.getState()[0]]
+            #print(agent.getState())
             
             #Generate line for poem and run nb classification for num of iterations
             for j in range(iterations):
@@ -41,15 +48,19 @@ class Poem:
                 
                 #Add initial state to poem, minus the last word of that state
                 for i in range(len(agent.getState()) - 1):
-                    tmpLine = agent.getState()[len(agent.getState()) - 1] + " " + tmpLine
+                    tmpLine = agent.getState()[i] + " " + tmpLine
                     sylCount += syllables.estimate(agent.getState()[i])
+                
+                print("1", tmpLine)
                 
                 #Generate line with roughly correct number of syllables
                 #len(agent.getState()) - 1] == END) implies line is finished
-                while(not(sylCount == s and agent.getState()[len(agent.getState()) - 1] == END)):
-                    if(sylCount > s or agent.getState()[len(agent.getState()) - 1] == END):    #If number of syllables has been surpassed or finished line has too few syllables 
+                while(not(sylCount > s and agent.getState()[len(agent.getState()) - 1] == END)):
+                    if(agent.getState()[len(agent.getState()) - 1] == END):              #If finished line has too few syllables 
                         #Restart with new line with new seed
-                        agent.setState(self.genSeed())
+                        agent.setState(self.genSeed(lsti))
+                        #print(agent.getState())
+                        self.lstWrds[lsti] = agent.getState()[0]
                         
                         tmpLine = ""
                         
@@ -58,6 +69,8 @@ class Poem:
                         for i in range(len(agent.getState()) - 1):
                             tmpLine = agent.getState()[i] + " " + tmpLine
                             sylCount += syllables.estimate(agent.getState()[i])
+                        
+                        print("2 ", tmpLine)
                     
                     tmpLine = agent.getState()[len(agent.getState()) - 1] + " " + tmpLine #Add the last word of the agent's current state to the line
                     sylCount += syllables.estimate(agent.getState()[len(agent.getState()) - 1]) #Update overall syllable count
@@ -70,8 +83,13 @@ class Poem:
                     bestLine = tmpLine
                     bestScore = tmpScore
                     
+                agent.setState(self.genSeed(lsti))  #Initialize seed for next iteration
+                    
             poem += bestLine
             poem += "\n"
+            
+            lsti += 1
+            agent.setState(self.genSeed(lsti)) #Initialize seed for next line
             
         return poem
     
@@ -130,30 +148,60 @@ class Poem:
             
         return poem
         
-    def nbDist(self, line):
-        #param: line to run Naive-Bayes classification on
-        #Get NaiveBayes probability distribution for category
-        score = PoemUtility.classifySentence(line, self.category)
-        return score
-        
-        #Return 0 when not testing nb classification. Training takes too long
-        return 0
-        
-    def genSeed(self):
+    def genSeed(self, index = 0):
         if(self.rhyme):
-            return self.gsRhyme()
+            return self.gsRhyme(index, 0)
             
         return self.gsNoRhyme()
     
-    def gsRhyme(self):
-        seed = tuple(self.markovMatrix.walk(None, self.markovMatrix.state_size))
+    def gsRhyme(self, i, j):
+        if(i > 1):  #if line must rhyme with previous line
+            seed = ("",) * self.markovMatrix.state_size 
+            agent = MarkovAgent(self.markovMatrix, seed)
         
+            seed = (BEGIN,)*(self.markovMatrix.state_size - 1)
         
+            if(j >= len(pronouncing.rhymes(self.lstWrds[i % 2]))):  #If all rhyming words have been exhausted
+                seed += (self.lstWrds[i % 2],)  #Use previous last word as first word in seed, [same word] rhymes with [same word]
+             
+            else:
+                seed += (pronouncing.rhymes(self.lstWrds[i % 2])[j],)  #Use rhyming word as first word in seed
+                
+            agent.setState(seed)
+            
+            #Finish seed seed
+            for k in range(self.markovMatrix.state_size - 1):
+                agent.transition()
+
+            seed = agent.getState()
+            
+            if(self.markovMatrix.move(seed) != END):    #If seed works
+                return seed
+                
+            return self.gsRhyme(i, j+1) #Else, try next rhyming word
+                
+        else:
+            #Same as generating seed for non rhyming line
+            seed = tuple(self.markovMatrix.walk(None, self.markovMatrix.state_size))
+        
+            if(len(seed) != self.markovMatrix.state_size): #If seed is wrong state size
+                return self.gsRhyme(i, 0)   #Retry
+                
+            return seed
     
     def gsNoRhyme(self):
         seed = tuple(self.markovMatrix.walk(None, self.markovMatrix.state_size))
         
-        if(len(seed) == 0): #If seed is empty
-            return self.genSeed()   #Retry
+        if(len(seed) != self.markovMatrix.state_size): #If seed is wrong state size
+            return self.gsNoRhyme()   #Retry
         
         return seed
+        
+    def nbDist(self, line):
+        #param: line to run Naive-Bayes classification on
+        #Get NaiveBayes probability distribution for category
+        #score = PoemUtility.classifySentence(line, self.category)
+        #return score
+        
+        #Return 0 when not testing nb classification. Training takes too long
+        return 0
