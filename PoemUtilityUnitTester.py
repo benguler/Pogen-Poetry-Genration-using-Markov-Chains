@@ -14,9 +14,9 @@ from PoemUtility import *
 class PoemUtilityUnitTester(unittest.TestCase):
     
     def test_tokenize(self):
-        filename = 'test.csv'
-        some_matrix = PoemUtility.tokenize(filename)
-        print(some_matrix)
+        filename = 'renaissance_nature.csv'
+        PoemUtility.tokenize(filename)
+        #print(some_matrix)
 
 
     def test_tokenize_exception(self):
@@ -25,7 +25,7 @@ class PoemUtilityUnitTester(unittest.TestCase):
             
 
     def test_classifyPoems(self):
-        filename = 'all_200.csv'
+        filename = 'renaissance_nature.csv'
         PoemUtility.classifyPoems(filename)
 
 

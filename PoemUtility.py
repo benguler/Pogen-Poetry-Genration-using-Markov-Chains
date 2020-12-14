@@ -10,18 +10,17 @@ This python script contains three important functionality
 
 3- Calculate the probability distance that the sentence belongs to the given poem category
 
+4- Helper method to remove punctuation from a string
+
 
 
 """
 
 import csv
-import string
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import RegexpTokenizer 
 from textblob import TextBlob
-
-#according to a StackOverflow thread the use of classifiers.py is faster in training and classifying
 from classifiers import NaiveBayesClassifier
 
 
@@ -32,7 +31,7 @@ class PoemUtility:
         tk = RegexpTokenizer("[\\w+']+|[^\\w\\s]+")
         try:
             matrix = []
-            with open ('CSVs/processed/'+filename, 'r') as csvfile:
+            with open ('CSVs/'+filename, 'r') as csvfile:
                 csv_reader = csv.reader(csvfile)
                 for line in csv_reader:
                     poem_sentence = line[0]
@@ -47,7 +46,7 @@ class PoemUtility:
     @staticmethod
     def classifyPoems(filename):
         try:
-            with open('CSVs/processed/'+filename, 'r') as fp:
+            with open('CSVs/'+filename, 'r') as fp:
                 print('opened ' + filename )
                 global cl
                 cl = NaiveBayesClassifier(fp, format="csv")
@@ -75,9 +74,7 @@ def removePunctuation(my_str):
             no_punct = no_punct + " "
         if char not in punctuations:
             no_punct = no_punct + char
-
-
-
+            
     # display the unpunctuated string
     #print(no_punct)
     return no_punct           
