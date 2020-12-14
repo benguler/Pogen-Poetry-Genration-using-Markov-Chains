@@ -15,10 +15,13 @@ This python script contains three important functionality
 """
 
 import csv
+import string
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import RegexpTokenizer 
 from textblob import TextBlob
-#from textblob.classifiers import NaiveBayesClassifier
 
-#according to StackOverflow use the classifiers.py is faster in training and classifying
+#according to a StackOverflow thread the use of classifiers.py is faster in training and classifying
 from classifiers import NaiveBayesClassifier
 
 
@@ -26,16 +29,16 @@ class PoemUtility:
 
     @staticmethod
     def tokenize(filename):
+        tk = RegexpTokenizer("[\\w+']+|[^\\w\\s]+")
         try:
             matrix = []
             with open ('CSVs/processed/'+filename, 'r') as csvfile:
-                csv_reader = csv.DictReader(csvfile)
-                data_lines = list(csv_reader)
-
-                for line in data_lines:
-                    poem_sentence = TextBlob(line['poem_line'])
-                    mystr = poem_sentence.words
-                    matrix.append(mystr)
+                csv_reader = csv.reader(csvfile)
+                for line in csv_reader:
+                    poem_sentence = line[0]
+                    poem_sentence = removePunctuation(poem_sentence)
+                    data = tk.tokenize(poem_sentence)
+                    matrix.append(data)
             return matrix
         except IOError:
             print ('\nFile not found in tokenize() method')
@@ -57,5 +60,25 @@ class PoemUtility:
     def classifySentence(sentence, category):
         prob_dist = cl.prob_classify(sentence)
         return round(prob_dist.prob(category),2)
-                
+
+
+def removePunctuation(my_str):
+    # define punctuation
+    punctuations = '''!()-[]{};:"\,<>./?@#$%^&*_~'''
+
+    mydot = "."
+
+    # remove punctuation from the string
+    no_punct = ""
+    for char in my_str:
+        if char == mydot:
+            no_punct = no_punct + " "
+        if char not in punctuations:
+            no_punct = no_punct + char
+
+
+
+    # display the unpunctuated string
+    #print(no_punct)
+    return no_punct           
         
