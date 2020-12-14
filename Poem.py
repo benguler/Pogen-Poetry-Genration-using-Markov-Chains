@@ -17,7 +17,7 @@ class Poem:
 
     def generatePoem(self):
         #Generate poem given specifications in constructor
-        agent = MarkovAgent(self.markovMatrix, self.genSeed())
+        agent = MarkovAgent(self.markovMatrix, self.genSeed())  #Create agent with poem seed as initial state
         poem = ""
         
         #For each line of the poem
@@ -30,7 +30,7 @@ class Poem:
                 
                 sylCount = 0
                 
-                #Add initial state to poem, minus the last word of that state
+                #Add initial state to poem (the seed), minus the last word of that state
                 for i in range(agent.stateSize - 1):
                     line += agent.getState()[i] + " "
                     sylCount += syllables.estimate(agent.getState()[i])
@@ -64,6 +64,7 @@ class Poem:
         return poem
     
     def genSeed(self):
+        #Generate initial n words of the poem
         seed = tuple(self.markovMatrix.walk(None, self.markovMatrix.state_size))
         
         if(len(seed) != self.markovMatrix.state_size): #If seed is wrong state size
