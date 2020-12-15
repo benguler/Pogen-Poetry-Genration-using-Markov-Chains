@@ -1,6 +1,7 @@
 import random
 import json
 import sys
+from PoemUtility import PoemUtility
 
 BEGIN = "___BEGIN__"
 END = "___END__"
@@ -83,30 +84,8 @@ class MarkovMatrix:
         """
         return list(self.gen(init_state, iteration))
 
-    def to_json(self):
-        return json.dumps(list(self.matrix.items()))
-
     def get_matrix(self):
         return self.matrix
-
-    @classmethod
-    def from_json(cls, data):
-        if isinstance(data, str):
-            obj = json.loads(data)
-        else:
-            obj = data
-
-        if isinstance(obj, list):
-            rehydrated = dict((tuple(item[0]), item[1]) for item in obj)
-        elif isinstance(obj, dict):
-            rehydrated = obj
-        else:
-            raise ValueError("Object should be dict or list")
-
-        state_size = len(list(rehydrated.keys())[0])
-
-        inst = cls(None, state_size, rehydrated)
-        return inst
 
 
 class ReverseMarkovMatrix(MarkovMatrix):
@@ -124,22 +103,3 @@ class ReverseMarkovMatrix(MarkovMatrix):
                     self.matrix[state][follow] = 0
 
                 self.matrix[state][follow] += 1
-
-
-''' Example Usage'''
-
-text = [["Farewell", "dear", "mate,", "dear", "love!"],
-        ["I’m", "going", "away,", "I", "know", "not", "where"],
-        ["Or", "to", "what", "fortune,", "or", "whether", "I", "may", "ever", "see", "you", "again"],
-        ["So", "Good-bye", "my", "Fancy"]]
-
-m = MarkovMatrix(text, 2)
-r = ReverseMarkovMatrix(text, 2)
-
-matrix = r.get_matrix()
-for key, value in matrix.items():
-    print(key, end=': ')
-    print(value)
-
-for i in range(4):
-    print(r.walk())

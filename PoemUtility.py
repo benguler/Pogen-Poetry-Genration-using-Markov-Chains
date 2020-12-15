@@ -15,7 +15,7 @@ This python script contains three important functionality
 
 
 """
-
+# need to install punkt manually by "nltk.download('punkt')"
 import csv
 import nltk
 from nltk.tokenize import word_tokenize

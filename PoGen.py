@@ -2,6 +2,7 @@ import sys
 import os
 from markov import MarkovMatrix
 from MarkovAgent import MarkovAgent
+from PoemUtility import PoemUtility
 from Poem import Poem
 
 TITLE = "\n\
@@ -19,18 +20,24 @@ TITLE = "\n\
 *           by: Alex Castro, Alex Li, Ben Guler          *\n\
 **********************************************************\n"
 
-def pogen(lines, genre, time, seed):
-    # Initialize MarkovAgent and Poem
-    # STUB
+def pogen(syl, time, genre, sBool):
+    # Initialize Poem class and generate the poem
+    category = time + '_' + genre
+    corpus = PoemUtility.tokenize(category + '.csv')
+    matrix = MarkovMatrix(corpus, 2)
 
-    print("\n*****************************************************************************\n")
-    print("This is a " + time + " " + genre + " poem with " + str(lines) + " lines that starts with " + seed + ".\n")
-    print("*****************************************************************************\n")
+    poeminstance = Poem(matrix, syl, category, sBool)
+    print("\nPlease wait a few seconds, PoGen is thinking...")
+    poem = poeminstance.generatePoem()
+
+    print("\n***********************************************\n")
+    print(poem)
+    print("***********************************************\n")
 
 def main():
     # Get user import and create poem with user specified parameters
     print(TITLE)
-    print("Please tell us what kind of poem you want to see.\n(You may type 0 at any point to exit)")
+    print("Please tell us what kind of poem you would like to see.\n(You may type 0 at any point to exit the program)")
 
     run = 1
     while run != 0:
@@ -45,27 +52,43 @@ def main():
             if lines == 0:
                 return
 
-        # Genre
-        genre = 'stub'
+        # syllables or not
+        sOption = 'stub'
+        sBool = False
         while True:
-            if genre == 'l' or genre == 'love':
+            if sOption == 'y' or sOption == 'yes':
+                sBool = True
                 break
-            elif genre == 'n' or genre == 'nature':
+            elif sOption == 'n' or sOption == 'no':
+                sBool = False
                 break
-            elif genre == 'm' or genre == 'mythology':
-                break
-            elif genre == '0':
+            elif sOption == '0':
                 return
             else:
-                genre = str(input("\nWhat genre is your poem?\n[(L)ove or (N)ature or (M)ythology]: "))
-                genre = genre.lower()
+                sOption = str(input("\nDoes your poem follow a syllable scheme?\n[(Y)es or (N)o]: "))
+                sOption = sOption.lower()
+
+        # Syllable scheme
+        syl = []
+        if sBool:
+            while len(syl) != lines:
+                try:
+                    syl = [int(item) for item in input("\nWhat syllable scheme does your poem have?\n[eg. 3 5 3]:").split()]
+                except ValueError:
+                    syl = []
+                if len(syl) > 0 and syl[0] == 0:
+                    return
+        else:
+            syl = [20] * lines
 
         # Time Period
         time = 'stub'
         while True:
             if time == 'm' or time == 'modern':
+                time = 'modern'
                 break
             elif time == 'r' or time == 'renaissance':
+                time = 'renaissance'
                 break
             elif time == '0':
                 return
@@ -73,13 +96,26 @@ def main():
                 time = str(input("\nWhat time period is your poem?\n[(M)odern or (R)enaissance)]: "))
                 time = time.lower()
 
-        # Seed
-        seed = str(input("\nWhat word does your poem start with?\n[A word of your choice]: "))
-        if seed == '0':
-            return
+        # Genre
+        genre = 'stub'
+        while True:
+            if genre == 'l' or genre == 'love':
+                genre = 'love'
+                break
+            elif genre == 'n' or genre == 'nature':
+                genre = 'nature'
+                break
+            elif genre == 'm' or genre == 'mythology':
+                genre = 'mythology_folklore'
+                break
+            elif genre == '0':
+                return
+            else:
+                genre = str(input("\nWhat genre is your poem?\n[(L)ove or (N)ature or (M)ythology]: "))
+                genre = genre.lower()
 
         # Poetry Generation
-        pogen(lines, genre, time, seed)
+        pogen(syl, time, genre, sBool)
 
         # Generate another poem
         repeat = 'stub'
@@ -98,6 +134,7 @@ def main():
 
 
 if __name__ == "__main__":
+    PoemUtility.classifyPoems('all_200.csv')
     main()
     print("\nThank you for using PoGen!\n")
     print("You can check out the project at https://github.com/benguler/Pogen-Poetry-Genration-using-Markov-Chains")
