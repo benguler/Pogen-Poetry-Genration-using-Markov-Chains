@@ -10,11 +10,11 @@ END = "___END__"
 
 class Poem:
     def __init__(self, markovMatrix, numSyls, category, sBool):
-        #params: markov probability matrix, number of syllables per line, category of poem (period_genre), bool that dictates if poem will have rhyming
+        #params: markov probability matrix, number of syllables per line, category of poem (period_genre), bool that dictates if poem will have explicit syllable count
         self.markovMatrix = markovMatrix
         self.numSyls = numSyls
         self.category = category
-        self.sBool = sBool
+        self.sBool = sBool  #True for explicit syllable count (line must have exactly n syllables) false for maximum syllable count (line may have at most n syllables)
 
     def generatePoem(self):
         #Generate poem given specifications in constructor
@@ -38,10 +38,12 @@ class Poem:
                     sylCount += syllables.estimate(agent.getState()[i])
                 
                 #Generate line with roughly correct number of syllables
-                #agent.stateSize - 1] == END) implies line is finished
+                #agent.getLastWord() == END) implies line is finished
                 
-                while(not((sylCount == syln if self.sBool else True) and agent.getLastWord() == END)):
-                    if((sylCount > syln if self.sBool else False) or (agent.getLastWord() == END if self.sBool else False)):    #If number of syllables has been surpassed or finished line has too few syllables 
+                #Runs while sylcount is not equal to required syllable count for line (or when sylcount is not <= syllable count when sBool is false) and end of line has not been reached
+                #Lines must go from BEGIN to END
+                while(not((sylCount == syln if self.sBool else sylCount <= syln) and agent.getLastWord() == END)):
+                    if(sylCount > syln or (agent.getLastWord() == END if self.sBool else False)):    #If number of syllables has been surpassed or finished line has too few syllables (only when syllables count has no min, i.e sBool = false)
                         #Restart with new line with new seed
                         agent.setState(self.genSeed())
                         
@@ -56,7 +58,7 @@ class Poem:
                     line += agent.getLastWord() + " "    #Add the last word of the agent's current state to the line
                     sylCount += syllables.estimate(agent.getLastWord()) #Update overall syllable count
                     
-                    agent.transition()  #Have the agent transition to a new state for next round of testing/next line
+                    agent.transition()  #Have the agent transition to a new state
                 
                 if(line not in lines):
                     score = self.nbDist(line)
