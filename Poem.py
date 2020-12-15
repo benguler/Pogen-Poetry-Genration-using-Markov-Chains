@@ -21,7 +21,7 @@ class Poem:
         # Generate poem given specifications in constructor
         agent = MarkovAgent(self.markovMatrix, self.genSeed())  # Create agent with poem seed as initial state
         poem = ""
-        lines = []
+        prevLines = []
 
         # For each line of the poem
         for syln in self.numSyls:
@@ -64,21 +64,22 @@ class Poem:
 
                     agent.transition()  # Have the agent transition to a new state
 
-                if (line not in lines):
+                if (line not in prevLines):
                     score = self.nbDist(line)
-                    agent.setState(
-                        self.genSeed())  # Initialize agent state to new seed for next line/round of nb classification
-                    lines += [line]
+                   
+                    prevLines += [line]
 
                 else:
                     score = 0
+                    
+                agent.setState(self.genSeed())  # Initialize agent state to new seed for next line/round of nb classification
 
+                
                 iterations += 1
                 if(iterations > 10):
-                    print("current minscore = ", minscore)
                     if minscore >= 0.3:
-                        minscore -= 0.2
-                    iteration = 0
+                        minscore -= 0.1
+                    iterations = 0
 
             poem += line
             poem += "\n"
