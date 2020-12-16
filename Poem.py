@@ -2,8 +2,6 @@ from MarkovAgent import MarkovAgent
 from markov import MarkovMatrix, ReverseMarkovMatrix
 from PoemUtility import PoemUtility
 import syllables
-import pronouncing
-import random
 
 BEGIN = "___BEGIN__"
 END = "___END__"
